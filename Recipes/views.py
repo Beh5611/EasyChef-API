@@ -38,6 +38,18 @@ class CreateRecipeView(CreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = RecipeSerializer
 
+    def create(self, request, *args, **kwargs):
+        data = QueryDict('', mutable=True)
+        data['owner'] = self.request.user.id
+        data.update(request.data)
+        serializer = self.get_serializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED,
+                        headers=headers)
+
+
 
 class CreateIngredientView(CreateAPIView):
     authentication_classes = [authentication.SessionAuthentication]
@@ -117,7 +129,7 @@ def UpdateRecipeView(request, *args, **kwargs):
 def UpdateIngredientView(request, *args, **kwargs):
     jresponse = {}
     r = get_object_or_404(Ingredient, id=kwargs['id'])
-    if request.method == 'POST':
+    if request.method   == 'POST':
         if name := request.POST.get('name', None):
             r.name = name
             jresponse['name'] = name
