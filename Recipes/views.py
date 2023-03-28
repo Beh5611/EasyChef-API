@@ -1,3 +1,5 @@
+import json
+
 from django.http import JsonResponse, QueryDict
 from django.shortcuts import get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
@@ -7,6 +9,7 @@ from rest_framework.decorators import api_view, permission_classes, authenticati
 from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from Recipes.Trie import trie
 
 from Recipes.models import Diet, Ingredient, Recipe, Step
 from Recipes.serializers import DietSerializer, IngredientSerializer, \
@@ -245,3 +248,21 @@ def DeleteStep(request, *args, **kwargs):
         r.delete()
         return Response(status=204)
     return Response(status=405)
+
+
+
+
+@csrf_exempt
+@api_view(('POST',))
+def AutoComplete(request, *args, **kwargs):
+    jresponse = {}
+    if request.method == 'POST':
+        if ingredient := request.POST.get('ingredient', None):
+            lst = trie.autoComplete(ingredient)
+            lst2 = trie.autoCorrect(ingredient, errorMax=10)
+            jresponse['auto_correct'] = lst2
+            jresponse['auto_complete'] = lst
+            jresponse['response'] = lst + list(set(lst2) - set(lst))
+        return JsonResponse(jresponse)
+    return Response(status=405)
+

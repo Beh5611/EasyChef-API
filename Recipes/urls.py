@@ -1,6 +1,7 @@
 from django.urls import path
 
-from Recipes.views import AccessRecipeView, AddDietView, CreateDietView, \
+from Recipes.views import AccessRecipeView, AddDietView, AutoComplete, \
+    CreateDietView, \
     CreateIngredientView, \
     CreateRecipeView, \
     CreateStepView, DeleteIngredient, DeleteRecipe, DeleteStep, \
@@ -34,4 +35,7 @@ urlpatterns = [
     path('<int:recipe_id>/create-step/', CreateStepView.as_view()),
     path('<int:id>/update-step/', UpdateStepView),
     path('<int:id>/delete-step/', DeleteStep),
+
+    #autocomplete
+    path('auto-complete/', AutoComplete)
 ]
