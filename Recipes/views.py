@@ -8,8 +8,9 @@ from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from Recipes.models import Diet, Ingredient, Recipe
-from Recipes.serializers import DietSerializer, IngredientSerializer, RecipeSerializer
+from Recipes.models import Diet, Ingredient, Recipe, Step
+from Recipes.serializers import DietSerializer, IngredientSerializer, \
+    RecipeSerializer, StepSerializer
 
 
 class RecipesView(ListAPIView):
@@ -26,11 +27,14 @@ class IngredientsView(ListAPIView):
         return Ingredient.objects.filter(recipe_ID=self.kwargs['recipe_id'])
 
 
-class DietsView(ListAPIView):
-    serializer_class = DietSerializer
+class StepsView(ListAPIView):
+    serializer_class = StepSerializer
 
     def get_queryset(self):
-        return Diet.objects.filter(recipe_ID=self.kwargs['recipe_id'])
+        return Step.objects.filter(recipe_ID=self.kwargs['recipe_id'])
+
+
+
 
 
 class CreateRecipeView(CreateAPIView):
@@ -48,6 +52,24 @@ class CreateRecipeView(CreateAPIView):
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED,
                         headers=headers)
+
+
+class CreateStepView(CreateAPIView):
+    authentication_classes = [authentication.SessionAuthentication]
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = StepSerializer
+
+    def create(self, request, *args, **kwargs):
+        data = QueryDict('', mutable=True)
+        data['recipe_ID'] = self.kwargs['recipe_id']
+        data.update(request.data)
+        serializer = self.get_serializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED,
+                        headers=headers)
+
 
 
 
@@ -73,16 +95,6 @@ class CreateDietView(CreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = DietSerializer
 
-    def create(self, request, *args, **kwargs):
-        data = QueryDict('', mutable=True)
-        data['recipe_ID'] = self.kwargs['recipe_id']
-        data.update(request.data)
-        serializer = self.get_serializer(data=data)
-        serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
-        headers = self.get_success_headers(serializer.data)
-        return Response(serializer.data, status=status.HTTP_201_CREATED,
-                        headers=headers)
 
 
 class AccessRecipeView(RetrieveAPIView):
@@ -90,6 +102,8 @@ class AccessRecipeView(RetrieveAPIView):
 
     def get_object(self):
         return get_object_or_404(Recipe, id=self.kwargs['recipe_id'])
+
+
 
 
 @csrf_exempt
@@ -148,6 +162,56 @@ def UpdateIngredientView(request, *args, **kwargs):
 
 
 @csrf_exempt
+@api_view(['POST'])
+@authentication_classes([SessionAuthentication])
+@permission_classes([IsAuthenticated])
+def UpdateStepView(request, *args, **kwargs):
+    jresponse = {}
+    r = get_object_or_404(Step, id=kwargs['id'])
+    if request.method   == 'POST':
+        if number := request.POST.get('number', None):
+            r.number = number
+            jresponse['number'] = number
+        if description := request.POST.get('description', None):
+            r.description = description
+            jresponse['description'] = description
+
+
+    r.save()
+    return JsonResponse(jresponse)
+
+
+@csrf_exempt
+@api_view(['POST'])
+@authentication_classes([SessionAuthentication])
+@permission_classes([IsAuthenticated])
+def UpdateDietView(request, *args, **kwargs):
+    r = get_object_or_404(Diet, id=kwargs['id'])
+    if request.method  == 'POST':
+
+        if rid := request.POST.get('recipe_ID', None):
+            r.recipe_ID.remove(rid)
+    r.save()
+    return Response(status=204)
+
+@csrf_exempt
+@api_view(['POST'])
+@authentication_classes([SessionAuthentication])
+@permission_classes([IsAuthenticated])
+def AddDietView(request, *args, **kwargs):
+    r = get_object_or_404(Diet, id=kwargs['id'])
+    if request.method  == 'POST':
+
+        if rid := request.POST.get('recipe_ID', None):
+            r.recipe_ID.add(rid)
+
+    r.save()
+    return Response(status=204)
+
+
+
+
+@csrf_exempt
 @api_view(('POST',))
 @authentication_classes([SessionAuthentication])
 @permission_classes([IsAuthenticated])
@@ -166,6 +230,18 @@ def DeleteRecipe(request, *args, **kwargs):
 def DeleteIngredient(request, *args, **kwargs):
     if request.method == 'POST':
         r = get_object_or_404(Ingredient, id=kwargs['id'])
+        r.delete()
+        return Response(status=204)
+    return Response(status=405)
+
+
+@csrf_exempt
+@api_view(('POST',))
+@authentication_classes([SessionAuthentication])
+@permission_classes([IsAuthenticated])
+def DeleteStep(request, *args, **kwargs):
+    if request.method == 'POST':
+        r = get_object_or_404(Step, id=kwargs['id'])
         r.delete()
         return Response(status=204)
     return Response(status=405)
