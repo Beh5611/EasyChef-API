@@ -249,8 +249,6 @@ def MyRecipes(request, *args, **kwargs):
         for i in rated:
             lst.add(i.post.recipe.id)
 
-
-
         jresponse = {}
         jresponse["fav"] = json.dumps(list(lst_fav))
         jresponse["created"] = json.dumps(list(lst_create))
