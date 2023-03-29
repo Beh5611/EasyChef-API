@@ -12,7 +12,6 @@ class Recipe(models.Model):
 
     prep_time = models.CharField(max_length=50)
     cook_time = models.CharField(max_length=50)
-    # step_list = models.TextField()
     owner = models.ForeignKey(to=UserProfile, null = False, related_name = 'Recipes', on_delete=CASCADE)
 
     def __str__(self):

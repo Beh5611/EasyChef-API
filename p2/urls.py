@@ -23,5 +23,5 @@ urlpatterns = [
     path('accounts/', include('Accounts.urls')),
     path('recipes/', include('Recipes.urls')),
     path('posts/', include('Posts.urls')),
-    # path('ShoppingCart/',include('ShoppingCart.urls'))
+    path('ShoppingCart/',include('ShoppingCart.urls'))
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
