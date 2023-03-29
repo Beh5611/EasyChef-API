@@ -1,9 +1,17 @@
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 from rest_framework import permissions, authentication
+from rest_framework.authentication import SessionAuthentication
+from rest_framework.decorators import api_view, permission_classes, authentication_classes
 from rest_framework.generics import CreateAPIView, RetrieveAPIView, get_object_or_404, ListAPIView, UpdateAPIView, \
     DestroyAPIView
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.utils import json
 
 from Posts.models import Post, Like, Favorite, Comment, Rating
 from Posts.serializers import PostSerializer, LikeSerializer, FavoriteSerializer, CommentSerializer, RatingSerializer
+from Recipes.models import Recipe
 
 
 class GetPostView(RetrieveAPIView):
@@ -207,3 +215,45 @@ class UnRatePostView(DestroyAPIView):
     def get_object(self):
         return get_object_or_404(Rating, post=self.request.data.get("post", None),
                                  user=self.request.data.get("user", None))
+
+
+
+
+
+@csrf_exempt
+@api_view(('GET',))
+@authentication_classes([SessionAuthentication])
+@permission_classes([IsAuthenticated])
+def MyRecipes(request, *args, **kwargs):
+    if request.method == 'GET':
+        fav = Favorite.objects.filter(user=request.user.id)
+        likes = Like.objects.filter(user=request.user.id)
+        comments = Comment.objects.filter(user=request.user.id)
+        recipes = Recipe.objects.filter(owner=request.user.id)
+        rated = Rating.objects.filter(user=request.user.id)
+        lst = set()
+        lst_create = set()
+        lst_fav = set()
+        for i in fav:
+            lst.add(i.post.recipe.id)
+            lst_fav.add(i.post.recipe.id)
+        for i in likes:
+            lst.add(i.post.recipe.id)
+        for i in comments:
+            lst.add(i.post.recipe.id)
+
+        for i in recipes:
+            lst.add(i.id)
+            lst_create.add(i.id)
+
+        for i in rated:
+            lst.add(i.post.recipe.id)
+
+        jresponse = {}
+        jresponse["fav"] = json.dumps(list(lst_fav))
+        jresponse["created"] = json.dumps(list(lst_create))
+        jresponse["all"] = json.dumps(list(lst))
+        return JsonResponse(jresponse, safe=False)
+    return Response(status=405)
+
+

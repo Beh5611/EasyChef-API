@@ -19,7 +19,7 @@ class Post(models.Model):
 
 
 class Favorite(models.Model):
-    user = models.OneToOneField(to=UserProfile, null = False, related_name = 'Favorites', on_delete=CASCADE)
+    user = models.ForeignKey(to=UserProfile, null = False, related_name = 'Favorites', on_delete=CASCADE)
     post = models.ForeignKey(to=Post, null = False, related_name = 'Favorited_by', on_delete=CASCADE)
 
     def __str__(self):
@@ -27,7 +27,7 @@ class Favorite(models.Model):
 
 
 class Like(models.Model):
-    user = models.OneToOneField(to=UserProfile, null=False, related_name='Liked', on_delete=CASCADE)
+    user = models.ForeignKey(to=UserProfile, null=False, related_name='Liked', on_delete=CASCADE)
     post = models.ForeignKey(to=Post, null=False, related_name='Likes', on_delete=CASCADE)
 
     def __str__(self):
@@ -52,7 +52,7 @@ validators=[FileExtensionValidator(allowed_extensions=['MOV','avi','mp4','webm',
 class Rating(models.Model):
     score = models.PositiveIntegerField(validators=[MaxValueValidator(5)])
     date = models.DateTimeField(auto_now_add=True, auto_created=True)
-    user = models.OneToOneField(to=UserProfile, null=False,
+    user = models.ForeignKey(to=UserProfile, null=False,
                              related_name='Rated', on_delete=CASCADE)
     post = models.ForeignKey(to=Post, null=False, related_name='Rating',
                              on_delete=CASCADE)
