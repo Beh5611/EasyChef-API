@@ -3,7 +3,7 @@ from django.urls import path
 from Posts.views import GetPostView, GetPostsView, CreatePostView, DeletePostView, LikePostView, GetPostLikesView, \
     GetLikedPostsView, UnLikePostView, FavoritePostView, GetFavoritedPostsView, UnFavoritePostView, CommentPostView, \
     GetCommentPostView, GetCommentedPostsView, EditCommentPostView, UnCommentPostView, RatePostView, GetRatePostView, \
-    EditRatingPostView, UnRatePostView, GetCommentsPostView, GetRatingsPostView
+    EditRatingPostView, UnRatePostView, GetCommentsPostView, GetRatingsPostView, MyRecipes
 
 urlpatterns = [
     path('create/', CreatePostView.as_view()),
@@ -28,5 +28,6 @@ urlpatterns = [
     path('<int:post>/rating/view/', GetRatePostView.as_view()),
     path('<int:post>/rating/view/all/', GetRatingsPostView.as_view()),
     path('rating/<int:pk>/edit/', EditRatingPostView.as_view()),
-    path('rating/<int:pk>/delete/', UnRatePostView.as_view())
+    path('rating/<int:pk>/delete/', UnRatePostView.as_view()),
+    path('myrecipes/', MyRecipes)
 ]
