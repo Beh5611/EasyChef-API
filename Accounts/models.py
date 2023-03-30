@@ -8,7 +8,7 @@ from django.db.models.signals import post_save
 
 class UserProfile(AbstractUser):
     phone_number = models.CharField(max_length=20)
-    avatar = models.ImageField(blank=True, upload_to='images/', default=None)
+    avatar = models.ImageField(blank=True, upload_to='images/', default='default/avatar.png')
 
     def __str__(self):
         return f"{self.username}'s profile"

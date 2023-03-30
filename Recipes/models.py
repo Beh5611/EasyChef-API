@@ -9,7 +9,8 @@ class Recipe(models.Model):
     name = models.CharField(max_length=50)
     cuisine = models.CharField(max_length=50)
     serving = models.IntegerField()
-
+    image = models.ImageField(blank=True, upload_to='images/recipe/',
+                              default='default/easychef.png')
     prep_time = models.CharField(max_length=50)
     cook_time = models.CharField(max_length=50)
     owner = models.ForeignKey(to=UserProfile, null = False, related_name = 'Recipes', on_delete=CASCADE)
@@ -19,7 +20,7 @@ class Recipe(models.Model):
 
 class Step(models.Model):
     number = models.IntegerField()
-    image = models.ImageField(blank=True, upload_to='images/steps/', default=None)
+    image = models.ImageField(blank=True, upload_to='images/steps/', default='default/easychef.png')
     description = models.CharField(max_length=250)
     recipe_ID = models.ForeignKey(to=Recipe, null=False,
                               related_name='step_list', on_delete=CASCADE)

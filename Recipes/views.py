@@ -135,6 +135,10 @@ def UpdateRecipeView(request, *args, **kwargs):
         if cook_time := request.POST.get('cook_time', None):
             r.cook_time = cook_time
             jresponse['cook_time'] = cook_time
+        if image := request.FILES['image']:
+            r.image = image
+
+
     r.save()
     return JsonResponse(jresponse)
 
@@ -178,7 +182,8 @@ def UpdateStepView(request, *args, **kwargs):
         if description := request.POST.get('description', None):
             r.description = description
             jresponse['description'] = description
-
+        if image := request.FILES['image']:
+            r.image = image
 
     r.save()
     return JsonResponse(jresponse)
