@@ -1,3 +1,4 @@
+from django.db.models import Avg, Count
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import permissions, authentication
@@ -26,7 +27,15 @@ class GetPostsView(ListAPIView, UpdateAPIView):
     serializer_class = PostSerializer
 
     def get_queryset(self):
-        return Post.objects.all()
+        if filter:=self.kwargs.get('filter', None):
+            if filter == 'ratings':
+                posts = Post.objects.annotate(avg_rating=Avg('Rating__score')).order_by(
+                    '-avg_rating')
+                return posts
+            elif filter == 'favorites':
+                posts = Post.objects.annotate(num_favorites=Count('Favorited_by')).order_by('-num_favorites')
+                return posts
+        return Response(status=405)
 
 
 class GetUserPostsView(ListAPIView, UpdateAPIView):

@@ -5,7 +5,6 @@ from ShoppingCart.views import AddItemView, RemoveItemView, \
     CreateShoppingCartView
 
 urlpatterns = [
-
     path('get-cart/', RetrieveShoppingCartView),
     path('create-cart/', CreateShoppingCartView.as_view()),
     path('remove/', RemoveItemView),

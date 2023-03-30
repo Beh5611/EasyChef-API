@@ -8,7 +8,7 @@ from Posts.views import GetPostView, GetPostsView, CreatePostView, DeletePostVie
 urlpatterns = [
     path('create/', CreatePostView.as_view()),
     path('<int:pk>/', GetPostView.as_view()),
-    path('all/', GetPostsView.as_view()),
+    path('<str:filter>/all/', GetPostsView.as_view()),
     path('<int:pk>/edit/', GetPostsView.as_view()),
     path('<int:pk>/delete/', DeletePostView.as_view()),
     path('<int:post>/favorite/', FavoritePostView.as_view()),
